@@ -1,7 +1,7 @@
 # 🔍 Inventory Obsolescence Risk Dashboard
 ## 📌 Project Overview
 
-In this project I created a tool for determining inventory at risk of becoming short-dated and eventually expiring. The insights and data presented in this dashboard will help Supply Chain, QA and Commercial Teams collaborate on eliminating inventory waste and reduce costly destructions. The project uses a **synthetic SKU master dataset**; no real data was used in this project.
+In this project I created a tool for determining inventory at risk of becoming short-dated and eventually expiring. The insights and data presented in this dashboard will help Supply Chain, QA and Commercial Teams collaborate on eliminating inventory waste and reduce costly destructions. The project uses a **synthetic inventory snapshot and inventory costs**; no real data was used in this project.
 
 The inventory snapshot data was generated using AI an Python. I then loaded the data into a PostgreSQL database to serve as the source of truth. I used Power Query to extract the data using SQL, and add conditional values based on expiration dates and an assummed 365 day aging profile across all SKUs.
 
@@ -33,82 +33,67 @@ PowerBI (Ingestion, Rule Validation, Visualization)
 
 ### 🛠️ Data Generation (Python)
 
--  Leveraged AI to create a [Python script](python/synth_sku_generator.py) used to generate a synthetic SKU master dataset with over 5,000 SKUs. The script allowed me to customize output, including the # of SKUs to generate and the percentage of errors to insert in the dataset.
+-  Leveraged AI to create a [Python script](python/synth_inv_snapshot.py) used to generate a synthetic inventory snapshot for 15 SKUs and 123 unique lots. The script allowed me to customize the minimum and maximum number of lots for each SKU. The otput was not perfect, and minor adjustments were made to the output to resemble real-world date. eg. inventory status for lots with past expiration dates were updated to "Expired".
 -  Included fields such as:
     -  SKU Number/Material Number
     -  Description with dosage form and strength
-    -  Commercial Classification
-    -  Brand/Label Type
--  Errors introduced
-    -  Missing values
-    -  Inconsistent SKU Numbers
-    -  Conflicting values
+    -  Lot
+    -  Inventory Status (Available, Unreleased, Short Dated, or Expired)
+    -  Quantity on Hand
+    -  Expiration Date
+- Anther script was used to generate random costs for each of the 15 SKUs.
  ---
 
 
 ### 🗄️ Data Storage (PostgreSQL)
 
-Loaded the synthetic dataset of Pharma and OTC products (csv format) into a local PostgreSQL database using the pgAdmin 4 admin tool. The table design resembled that of the csv dataset. No cleansing was performed, only verification that all data was loaded properly.
+I loaded the synthetic datasets (csv format) into a local PostgreSQL database using the pgAdmin 4 admin tool. The table columns resemble those of the csv dataset headers.
 
-**First 10 rows**
+**Inventory First 10 rows**
 
-![SKU Master First 10 Rows](screenshots/postgresql_check_10_rows.png) 
+![SKU Master First 10 Rows](screenshots/Postresql_inventory_top_10_rows.png) 
 
 **Column Names and Data Types**
 
-![Column Names and Data Types](screenshots/postgresql_column_names_types.png)
+![Column Names and Data Types](screenshots/Postresql_inventory_col_types.png)
 
-**Count of Records**
+### 🔍 Data Ingestion and Short Date Profiling (Power BI)
 
-![Count of Records](screenshots/postgresql_check_total_records.png)
+-  I used PowerQuery to conenct to the local PostgreSQL database, and then loaded the data using using Import Mode so I could add Custom Columns. In this step I added a SQL query that would add an additional column to categorize expiration dates.
+    - Aging profile on all lots is 365 days i.e. lots will go into short-dated status 365 days before the expiration date
+    - Lots are categorized by when they will short-date relative to the present date: 1-3 months, 4-6 months, 7-12 months, or over 12 months into the future.
+-  Added a custom column to determine of lot was at risk nor not at-risk of short dating or expiring (i.e. already short dated)
 
-### 🔍 Data Ingestion and Data Quality Rules (Power BI)
+**Initial Load into PowerQuery** [M code](powerquery/M-code.txt)
 
--  I used PowerQuery to conenct to the local PostgreSQL database, and then loaded the data using using Import Mode so I could add Custom Columns.
--  Added Custom Columns to apply data rules to generate a boolean value. True = exception, False = no exception (data follows rule).
-    -  SKU number must follow a ######ABC naming format (6 numeric characters, 3 alphabetic characters)
-    -  Description must contain commercial classification ('General Market', 'Sample', 'Private Label') and, conversely, Commercial Classification must match this description
-    -  Product Type must be 'OTC' or 'Pharma' with no blanks
-    -  Lot Control has to be set to 'Yes' for all products with no blanks
-    -  Primary Distribution Center must be one of five valid DCs with no blanks
-    -  ABC Code (used accounting and cycle counting) must be populated with A, B, or C
+### 📊 Dashboard Features, Insights, and Inventory Detail
 
-**Initial Load into PowerQuery** [M code](powerquery/m_code.txt)
-
-![PowerQuery Initial Load](screenshots/powerquery_db_connection.png)
-
-
-
-### 📊 Dashboard Features, Insights, and Action Plan
-
-The design of the PowerBI dashboard includes:
--  Overall data quality score (card)
--  Count of SKUs failing one or more rules (card)
--  Count of rule failures across the entire dataset (card)
--  Count of SKUs being considered in the analysis (card)
--  Breakdown of rule failures by type (stacked bar chart)
--  Breakdown of SKUs failing one or more rules by Product Type and Commercial Classification (clustered column chart)
--  Table of all SKUs failing one or more rules, with the option to filter/search by SKU
+The design of the Power BI dashboard includes:
+-  Total value of inventory by short-dating timeframe (cards)
+-  Total inventory value (card)
+-  Visual breakdown of inventory short-dating within the next 12 months (graph)
+-  Visual breakdown of at-risk and not-at-risk inventory (graph)
+-  List of top 5 SKU/Lots at risk of short-dating by value (table)
+-  List of top 5 SKU/Lots in "Unreleased" status (table)
+-  Inventory detail view for all inventory under analysis with buttons for quick filtering (new page with table)
 
 **Dashoard**
 
 ![Dashboard](screenshots/dashboard.png)
 
-**The dashboard is reporting a 51% data quality level**, or 2673 out of 5489 SKUs not meeting all data quality rules. While there is significannt work to be done, the dashboard enables the work to be broken down into **manageabe, actionable tasks.**
+**Inventory Detail**
+
+![Dashboard](screenshots/inventory_detail.png)
+
+**The dashboard is reporting $409k of all inventory ($2.6m) is at risk of short-dating within the next three months.** Overall, $529k in inventory will short-date within the next 12 months. The highest risk lies on SKU 785332PHM, Lot X60X618 (Albuterol Sulfate Inhalation Aerosol) at $168k short-dating in less than three months.
+
+In the details page we see that there is about **$836k in inventory is already short-dated.**
 
 Several **actionables** can be determined by using this dashboard
 
-**Quick Wins**
-  -  SKU naming conventions can be easily resolved. This only affects 29 SKUs but it is low-hanging fruit. This would be a quick win.
-  -  Lot Control flag should be set as YES to on all SKUs. This update should be quick using SQL and it would correct 363 SKUs. This is also a quick win.
-      ```
-      UPDATE table
-      SET lot_control_flag = 'Yes';
-      ```     
-  **Long Term Actionables**
-  -  Incorrect Primary DC or blank values would require input from Supply Chain and Logistics teams, but this only affects 330 of SKUs.
-  -  SKU Description and Commercial Classification. SKU description should include the Commercial Classification for 'Samples' and 'Private Label'. Determining and confirming these values would require input from commercial teams.
-  -  ABC code updates would require Inventory Control or Finance/Accounting input. These are critical for cycle-counts at the DC and for audit purposes. Financial Reporting Group can also be considered in these discussions.
+  -  Commercial teams should reach out to existing customers about taking short-dated inventory at a discounted price.
+  -  Supply Chain and QA should work on releasing Unreleased inventory before it becomes short-dated.
+  -  Planing and Supply Chain Teams should work on better forecasts for Albuterol Sulfate Inhalation Aerosol (785332PHM), adjusting production or purchase orders if sourced from a CMO.
 
 **Proposed Action Plan**
 
