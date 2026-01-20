@@ -81,7 +81,7 @@ The design of the Power BI dashboard includes:
 
 ![Dashboard](screenshots/dashboard.png)
 
-**Inventory Detail**
+**Inventory Detail (Short Dated filter applied)**
 
 ![Dashboard](screenshots/inventory_detail.png)
 
@@ -94,37 +94,6 @@ Several **actionables** can be determined by using this dashboard
   -  Commercial teams should reach out to existing customers about taking short-dated inventory at a discounted price.
   -  Supply Chain and QA should work on releasing Unreleased inventory before it becomes short-dated.
   -  Planing and Supply Chain Teams should work on better forecasts for Albuterol Sulfate Inhalation Aerosol (785332PHM), adjusting production or purchase orders if sourced from a CMO.
-
-**Proposed Action Plan**
-
--  Tackle the quick wins first. These may only take a day or two to complete. Mass updates to SQL tables should still be performed with caution and be done in a Quality environment first.
--  Set time with subject matter experts to verify values (Description vs Commercial Classification, Incorrect/Missing DC, ABC Codes)
-
-Long term actionables will require input for validation and verification of planned corrections, but this can happen in tandem with enforcement of rules for all new SKUs and SKU updates, along with additional training in best data entry and data stewardship practices.
-
-### Realistic Two Week Progress Report
-
-After two weeks, the following realistic improvements were achieved, increasing data from **51% to 78%**:
-- 29 SKU numbers updated following naming rules. Root cause: 6th and 7th character had been switched
- 
-  ![SKU Corrections Verification](screenshots/postgresql_sku_corrections_verification.png)
-  
-- 363 Lot Control Flags updated to 'Yes'
-
-  ![SKU Corrections Verification](screenshots/postgresql_lot_control_update.png)
-
-- 1,427 SKU descripions updated to match Commercial Classification. These required the Commercial Classification to be added to the description
-  
-  ![SKU Corrections Verification](screenshots/postgresql_description_comm_class_update.png)
-  
-- ABC codes updated (**note:** A virtually equal distribution of ABC codes is highly unlikely)
-
-  ![SKU Corrections Verification](screenshots/postgresql_abc_codes_corrected.png)
-
-**Dashboard Present State**
-
-![Dashboard Present State](screenshots/dashboard_post_data_cleanse.png)
-
 
 ---
 
