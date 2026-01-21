@@ -3,11 +3,11 @@
 
 In this project I created a tool for determining inventory at risk of becoming short-dated and eventually expiring. The insights and data presented in this dashboard will help Supply Chain, QA and Commercial Teams collaborate on eliminating inventory waste and reduce costly destructions. The project uses a **synthetic inventory snapshot and inventory costs**; no real data was used in this project.
 
-The inventory snapshot data was generated using AI an Python. I then loaded the data into a PostgreSQL database to serve as the source of truth. I used Power Query to extract the data using SQL, and add conditional values based on expiration dates and an assummed 365 day aging profile across all SKUs.
+The inventory snapshot data was generated using AI and Python. I then loaded the data into a PostgreSQL database to serve as the source of truth. I used Power Query to extract the data using SQL, and add conditional values based on expiration dates and an assumed 365-day aging profile across all SKUs.
 
 This project closely reflects my day-to-day work in inventory analytics in a pharmaceutical environment.
 
-**Note:** This project is an oversimplification of a real inventory data.
+**Note:** This project is an oversimplification of a real inventory dataset.
 
 ---
 
@@ -27,13 +27,13 @@ PostgreSQL (Relational Database Storage)
 
   ⬇️
   
-PowerBI (Ingestion, Rule Validation, Visualization)
+Power BI (Ingestion, Rule Validation, Visualization)
 
 ---
 
 ### 🛠️ Data Generation (Python)
 
--  Leveraged AI to create a [Python script](python/synth_inv_snapshot.py) used to generate a synthetic inventory snapshot for 15 SKUs and 123 unique lots. The script allowed me to customize the minimum and maximum number of lots for each SKU. The otput was not perfect, and minor adjustments were made to the output to resemble real-world date. eg. inventory status for lots with past expiration dates were updated to "Expired".
+-  Leveraged AI to create a [Python script](python/synth_inv_snapshot.py) used to generate a synthetic inventory snapshot for 15 SKUs and 123 unique lots. The script allowed me to customize the minimum and maximum number of lots for each SKU. The output was not perfect, and minor adjustments were made to the output to resemble real-world data. e.g., inventory status for lots with past expiration dates were updated to "Expired".
 -  Included fields such as:
     -  SKU Number/Material Number
     -  Description with dosage form and strength
@@ -41,7 +41,7 @@ PowerBI (Ingestion, Rule Validation, Visualization)
     -  Inventory Status (Available, Unreleased, Short Dated, or Expired)
     -  Quantity on Hand
     -  Expiration Date
-- Anther script was used to generate random costs for each of the 15 SKUs.
+- Another script was used to generate random costs for each of the 15 SKUs.
  ---
 
 
@@ -59,12 +59,12 @@ I loaded the synthetic datasets (csv format) into a local PostgreSQL database us
 
 ### 🔍 Data Ingestion and Short Date Profiling (Power BI)
 
--  I used PowerQuery to conenct to the local PostgreSQL database, and then loaded the data using using Import Mode so I could add Custom Columns. In this step I added a SQL query that would add an additional column to categorize expiration dates.
+-  I used Power Query to connect to the local PostgreSQL database, and then loaded the data using Import Mode so I could add Custom Columns. In this step I added a SQL query that would add an additional column to categorize expiration dates.
     - Aging profile on all lots is 365 days i.e. lots will go into short-dated status 365 days before the expiration date
     - Lots are categorized by when they will short-date relative to the present date: 1-3 months, 4-6 months, 7-12 months, or over 12 months into the future.
 -  Added a custom column to determine of lot was at risk nor not at-risk of short dating or expiring (i.e. already short dated)
 
-**Initial Load into PowerQuery** [M code](powerquery/M-code.txt)
+**Initial Load into Power Query** [M code](powerquery/M-code.txt)
 
 ### 📊 Dashboard Features, Insights, and Inventory Detail
 
@@ -77,7 +77,7 @@ The design of the Power BI dashboard includes:
 -  List of top 5 SKU/Lots in "Unreleased" status (table)
 -  Inventory detail view for all inventory under analysis with buttons for quick filtering (new page with table)
 
-**Dashoard**
+**Dashboard**
 
 ![Dashboard](screenshots/dashboard.png)
 
@@ -93,7 +93,7 @@ Several **actionables** can be determined by using this dashboard
 
   -  Commercial teams should reach out to existing customers about taking short-dated inventory at a discounted price.
   -  Supply Chain and QA should work on releasing Unreleased inventory before it becomes short-dated.
-  -  Planing and Supply Chain Teams should work on better forecasts for Albuterol Sulfate Inhalation Aerosol (785332PHM), adjusting production or purchase orders if sourced from a CMO.
+  -  Planning and Supply Chain Teams should work on better forecasts for Albuterol Sulfate Inhalation Aerosol (785332PHM), adjusting production or purchase orders if sourced from a CMO.
 
 ---
 
