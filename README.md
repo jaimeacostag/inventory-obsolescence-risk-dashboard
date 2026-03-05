@@ -1,5 +1,5 @@
-# 🔍 Inventory Obsolescence Risk Dashboard
-## 📌 Project Overview
+#  Inventory Obsolescence Risk Dashboard
+##  Project Overview
 
 In this project I created a tool for determining inventory at risk of becoming short-dated and eventually expiring. The insights and data presented in this dashboard will help Supply Chain, QA and Commercial Teams collaborate on eliminating inventory waste and reduce costly destructions. The project uses a **synthetic inventory snapshot and inventory costs**; no real data was used in this project.
 
@@ -11,13 +11,13 @@ This project closely reflects my day-to-day work in inventory analytics in a pha
 
 ---
 
-## 🧠 Problem Statement
+##  Problem Statement
 
 Raw inventory data is often stored in complex ERP systems or static spreadsheets. While the data exists, it isn't actionable. Stakeholders need a way to transform thousands of rows of lot-level data into a prioritized "hit list" that identifies exactly which products need immediate attention to save their value. This will reduce or eliminate costly write-offs and product destructions.
 
 ---
 
-## 🏗️ Workflow and Tools Overview
+##  Workflow and Tools Overview
 
 ChatGPT & Python (Synthetic Data Generation)
 
@@ -31,7 +31,7 @@ Power BI (Ingestion, Rule Validation, Visualization)
 
 ---
 
-### 🛠️ Data Generation (Python)
+###  Data Generation (Python)
 
 -  Leveraged AI to create a [Python script](python/synth_inv_snapshot.py) used to generate a synthetic inventory snapshot for 15 SKUs and 123 unique lots. The script allowed me to customize the minimum and maximum number of lots for each SKU. The output was not perfect, and minor adjustments were made to the output to resemble real-world data. e.g., inventory status for lots with past expiration dates were updated to "Expired".
 -  Included fields such as:
@@ -45,7 +45,7 @@ Power BI (Ingestion, Rule Validation, Visualization)
  ---
 
 
-### 🗄️ Data Storage (PostgreSQL)
+###  Data Storage (PostgreSQL)
 
 I loaded the synthetic datasets (csv format) into a local PostgreSQL database using the pgAdmin 4 admin tool. The table columns resemble those of the csv dataset headers.
 
@@ -57,7 +57,7 @@ I loaded the synthetic datasets (csv format) into a local PostgreSQL database us
 
 ![Column Names and Data Types](screenshots/Postresql_inventory_col_types.png)
 
-### 🔍 Data Ingestion and Short Date Profiling (Power BI)
+###  Data Ingestion and Short Date Profiling (Power BI)
 
 -  I used Power Query to connect to the local PostgreSQL database, and then loaded the data using Import Mode so I could add Custom Columns. In this step I added a SQL query that would add an additional column to categorize expiration dates.
     - Aging profile on all lots is 365 days i.e. lots will go into short-dated status 365 days before the expiration date
@@ -66,7 +66,7 @@ I loaded the synthetic datasets (csv format) into a local PostgreSQL database us
 
 **Initial Load into Power Query** [M code](powerquery/M-code.txt)
 
-### 📊 Dashboard Features, Insights, and Inventory Detail
+###  Dashboard Features, Insights, and Inventory Detail
 
 The design of the Power BI dashboard includes:
 -  Total value of inventory by short-dating timeframe (cards)
@@ -97,7 +97,7 @@ Several **actionables** can be determined by using this dashboard
 
 ---
 
-## 🗂️ Repository Structure
+##  Repository Structure
 
 ```text
 /
